@@ -9,6 +9,7 @@
   "author": "Owen Gombas",
   "license": "MIT",
   "dependencies": {
+    "colors": "^1.2.5",
     "fs-path": "^0.0.24",
     "puppeteer": "^1.4.0"
   }
