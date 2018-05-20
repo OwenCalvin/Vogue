@@ -1,4 +1,4 @@
-## Vogue  
+# Vogue  
 Use the manga.csv file to enter the manga you want to download  
 the $ separator is used to specify which chapter you want to download  
   
@@ -10,5 +10,5 @@ Nartuto
 You specify you want the One Piece chapters from 20 to 34  
 and all Naruto chapters
 
-# CAUTION
+## Caution
 I am not responsible for the consequences
