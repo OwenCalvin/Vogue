@@ -5,14 +5,16 @@ const puppeteer = require('puppeteer');
 const colors = require('colors')
 const fileContent = file.readFileSync('./mangas.csv', {encoding: 'utf8'});
 const start = `https://mangadex.org/quick_search/`;
+/*
 const cookies = [{
   value: '1',
   name: 'mangadex_filter_langs'
 }];
+*/
 const mangas = [];
 fileContent.split('\r\n').forEach(item => {
   if (!(/^\s*$/.test(item))) {
-    const params = item.split('-');
+    const params = item.split('$');
     let minmax = params[1] ? params[1].split(':') : null;
     if (minmax && minmax.length < 2) {
       minmax = [null, null]
@@ -33,14 +35,17 @@ fileContent.split('\r\n').forEach(item => {
     const searchPage = await browser.newPage();
     await searchPage.goto(encodeURI(`${start}${manga.name}`));
     console.log(encodeURI(`${start}${manga.name}`));
-    await searchPage.setCookie(...cookies);
+    // await searchPage.setCookie(...cookies);
     const link = await searchPage.evaluate((manga) => {
       const el = document.querySelector(`a[title="${manga}"]`)
       return el ? el.href : null
     }, manga.name);
     if (link) {
       await searchPage.goto(link)
-      const pages = await searchPage.evaluate(() => { return document.querySelector('.pagination').children.length - 2 });
+      const pages = await searchPage.evaluate(() => {
+        let el = document.querySelector('.pagination')
+        return el ? el.children.length - 2 : 1
+      });
       for (let page = 1; page <= pages; page++) {
         const contentPage = await browser.newPage();
         await contentPage.goto(encodeURI(`${link}/chapters/${page}`))
@@ -51,7 +56,8 @@ fileContent.split('\r\n').forEach(item => {
             const selectedChapter = tr.children[1].firstElementChild
             ass.push({
               link: selectedChapter.href,
-              chapter: parseInt(selectedChapter.getAttribute('data-chapter-num'))
+              chapter: parseInt(selectedChapter.getAttribute('data-chapter-num')),
+              lang: tr.children[3].firstElementChild.alt
             })
           }
           return ass
@@ -67,11 +73,11 @@ fileContent.split('\r\n').forEach(item => {
               const imageLink = await contentPage.evaluate(() => { return document.querySelector('#current_page').src });
               const imagePage = await browser.newPage()
               const view = await imagePage.goto(imageLink)
-              fs.writeFile(`./mangas/${manga.name}/chapter${chapterLink.chapter}/image${j}.png`, await view.buffer(), err => {
+              fs.writeFile(`./mangas/${manga.name}/${chapterLink.lang}/chapter${chapterLink.chapter}/image${j}.png`, await view.buffer(), err => {
                 if (err) {
                   console.log(colors.red(err));
                 } else {
-                  console.log(colors.gray(`\n+--------------------------+\nManga: ${manga.name}\nChapitre ${chapterLink.chapter}\nPage: ${j}\nSauvegardée\n+--------------------------+`));
+                  console.log(colors.gray(`\n+--------------------------+\nManga: ${manga.name}\nChapitre ${chapterLink.chapter}\nPage: ${j}\nLangue: ${chapterLink.lang}\nSauvegardée\n+--------------------------+`));
                 }
               });
             }
