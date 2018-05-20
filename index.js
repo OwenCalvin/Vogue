@@ -3,16 +3,18 @@ const url = require('querystring');
 const file = require('fs');
 const puppeteer = require('puppeteer');
 const colors = require('colors')
+const os = require('os');
 const fileContent = file.readFileSync('./mangas.csv', {encoding: 'utf8'});
 const start = `https://mangadex.org/quick_search/`;
+const mangas = [];
 /*
 const cookies = [{
   value: '1',
   name: 'mangadex_filter_langs'
 }];
 */
-const mangas = [];
-fileContent.split('\r\n').forEach(item => {
+
+fileContent.split(os.EOL).forEach(item => {
   if (!(/^\s*$/.test(item))) {
     const params = item.split('$');
     let minmax = params[1] ? params[1].split(':') : null;
