@@ -9,3 +9,6 @@ Nartuto
 ```  
 You specify you want the One Piece chapters from 20 to 34  
 and all Naruto chapters
+
+# CAUTION
+I am not responsible for the consequences
